@@ -1,34 +1,54 @@
 import { configureExpressApp } from "./../../server/src/setup"
 import expressWs from "express-ws"
+import LinkedList from "fast-linked-list"
+import { Data, DataBase } from "josm"
+import hash from "./hash"
+
+
 const app = configureExpressApp("/", "public", undefined, (app) => {expressWs(app)}) as ReturnType<typeof configureExpressApp> & { ws: (route: string, fn: (ws: WebSocket & {on: WebSocket["addEventListener"], off: WebSocket["removeEventListener"]}, req: any) => void) => void }
 
 
-let admins = 1
+
+const clients: DataBase<{[identifier: string]: {val: Data<number>, name: Data<string>}}> = new DataBase({}) as any;
+
+
 app.ws("/admin", (ws) => {
-  
-  const c = admins
-  ws.on("message", (e) => {
-    console.log(e, "from admin " + c)
-  })
+  console.log("admin connect")
+  clients((clients: any, diff: any) => {
+    ws.send(JSON.stringify(diff, (k, v) => v === undefined ? null : v))
+  }, true)
 
-  console.log("admin connected", admins++)
+  ws.on("message", ({ data: diff}) => {
+    clients(JSON.parse(diff, (k, v) => v === null ? undefined : v))
+  })
 })
 
-let clients = 1
+
+
 app.ws("/client", (ws) => {
+  console.log("client connect")
+
+  const c = {}
+  const h = hash()
   
-  const c = clients
+  c[h] = {
+    val: 0, 
+    name: ""
+  }
+
+
+  const me = clients(c)[h]
+
+  me.val.get((val) => {ws.send(JSON.stringify({val}))})
+  me.name.get((name) => {ws.send(JSON.stringify({name}))})
+  
+  
   ws.on("message", (e) => {
-    console.log(e, "from client " + c)
+    const msg = JSON.parse(e.data)
+    for (let k in msg) {
+      if (me[k]) me[k].set(msg[k])
+    }
   })
-  console.log("client connected", clients++)
-})
-
-
-app.post("/echo", (req, res) => {
-  console.log("post")
-  res.send(req.body)
-
 })
 
 
