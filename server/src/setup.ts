@@ -35,6 +35,7 @@ export function configureExpressApp(indexUrl: string, publicPath: string, sendFi
         let file = fs.readFileSync(path).toString()
         let extName = pth.extname(path)
         let end = await proxy(file, pth.extname(path), pth.basename(path, extName))
+        console.log(end)
         if (end === undefined) res.send(file)
         else if (end === null) res.status(400).end()
         else res.send(end)

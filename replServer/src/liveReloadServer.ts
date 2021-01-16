@@ -32,7 +32,7 @@ export default function init(indexUrl: string = "*", wsUrl: string = "/") {
   let clients: Set<WebSocket>
   const ex = configureExpressApp(indexUrl, publicPath, new Promise((res) => {activateSetFileProxy = res}), (app) => {
     let appWss = expressWs(app)
-    clients = appWss.getWss(wsUrl).clients;
+    clients = appWss.getWss().clients;
     (app as any).ws(wsUrl, () => {})
   })
 
