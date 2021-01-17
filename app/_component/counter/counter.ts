@@ -1,7 +1,8 @@
 import Component from "../component"
 import declareComponent from "../../lib/declareComponent"
 import { Data, DataBase } from "josm"
-import "./../../global"
+import Input from "./../input/input"
+
 
 
 
@@ -15,14 +16,14 @@ export default class Counter extends Component {
     const counterPlus = ce("counter-plus").addClass("count")
     counterPlus.innerHTML = require("./icon/plus.pug").default
     counterPlus.on("click", () => {
-      inp.value(inp.value() + 1)
+      inp.value(inp.value() as number + 1)
       inp.select()
     })
     counter.apd(counterPlus)
     
 
     //@ts-ignore
-    const inp = input(undefined, "number", undefined, undefined, (n: number) => {
+    const inp = new Input(undefined, "number", undefined, undefined, (n: number) => {
       if (!isNaN(n)) {
         if (n < 0) {
           return "Positive Zahl erwartet"
@@ -78,7 +79,7 @@ export default class Counter extends Component {
   }
 
   stl() {
-    return require("./client.css")
+    return require("./counter.css")
   }
   pug() {
     return ""

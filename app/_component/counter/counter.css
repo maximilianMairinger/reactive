@@ -21,7 +21,7 @@ counter-wrapper > * {
   height: 16px;
   width: 16px;
   transition: .3s;
-  height: 100%;
+  cursor: pointer;
 }
 
 .count:last-child {
@@ -30,4 +30,8 @@ counter-wrapper > * {
 
 .count:first-child {
   padding-left: 5px;
+}
+svg {
+  width: 100%;
+  height: 100%;
 }

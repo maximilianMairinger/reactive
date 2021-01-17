@@ -30,7 +30,7 @@ export default class Input extends Component {
       this.unintrusiveListener.deactivate()
     }
   }, false)
-  constructor(placeholder: string = "", type: "password" | "text" | "number" | "email" | "uppercase" = "text", public submitCallback?: (value: string | number, e: KeyboardEvent) => void, value?: any, public customVerification?: (value?: string | number) => (boolean | string | void), public intrusiveValidation?: boolean) {
+  constructor(placeholder: string = "", type: "password" | "text" | "number" | "email" | "uppercase" = "text", public submitCallback?: (value: string | number, e: KeyboardEvent) => void, value?: any, public customVerification?: (value?: string | number) => (boolean | string | void), formHolder?: (set: string | number) => string | void, public intrusiveValidation?: boolean) {
     super(false);
     
     this.type(type)
@@ -44,9 +44,19 @@ export default class Input extends Component {
     });
 
     this.placeholderElem.tabIndex = -1
+
+
+    
     
 
     // ----- Validation start
+
+    if (formHolder) {
+      this.onInput((e) => {
+        let q = formHolder(e)
+        if (q !== undefined) this.value(q as any )
+      })
+    }
 
     // unintrusive
 
@@ -132,6 +142,10 @@ export default class Input extends Component {
     this.allElems.addClass("disabled")
     if (this.isFocused) this.placeholderElem.focus()
     this.enterAlreadyPressed = false
+  }
+
+  public select() {
+    this.input.select()
   }
 
   public focus() {
