@@ -38,7 +38,6 @@ export default class Counter extends Component {
 
 
     const onInp = (c) => {
-      debugger
       console.log("c", c, !isNaN(c as number))
       if (!isNaN(c as number)) {
         countSub.deactivate()
@@ -48,13 +47,12 @@ export default class Counter extends Component {
       
     }
 
-    inp.onInput(onInp)
+    inp.onInput(onInp, true)
 
     const countSub = count.get((count) => {
-      debugger
-      inp.offInput(onInp)
+      inp.offInput(onInp, true)
       inp.value(count)
-      inp.onInput(onInp)
+      inp.onInput(onInp, true)
     })
 
 

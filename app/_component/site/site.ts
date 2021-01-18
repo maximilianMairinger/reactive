@@ -8,11 +8,26 @@ const ws = new WebSocket((document.location.protocol === "https:" ? "wss://" : "
 
 console.log((document.location.protocol === "https:" ? "wss://" : "ws://") + document.location.host + "/admin")
 ws.addEventListener("open", () => {
-  ws.addEventListener("message", ({ data }) => {
-    db(JSON.parse(data, (k, v) => v === null ? undefined : v))
+  ws.addEventListener("message", ({ data: strData }) => {
+    let data: any
+    try {
+      data = JSON.parse(strData, (k, v) => v === null ? undefined : v)
+    }
+    catch(e) {
+      return
+    }
+    
+
+
+    serverSub.deactivate()
+    db(data)
+    serverSub.activate(false)
   })
 
-  ws.send("hello")
+  let serverSub = db((data, diff) => {
+    console.log("send diff", diff)
+    ws.send(JSON.stringify(diff))
+  }, true, false)
 })
 
 
