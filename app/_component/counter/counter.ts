@@ -8,8 +8,10 @@ import Input from "./../input/input"
 
 export default class Counter extends Component {
 
-  constructor(public count: Data<number>) {
+  constructor(count: Data<number>) {
     super()
+
+    
 
     const counter = ce("counter-wrapper")
 
@@ -37,18 +39,26 @@ export default class Counter extends Component {
     })  
 
 
-    const onInput = (e) => {
-      inputCountSub.deactivate()
-      count.set(e as number)
-      inputCountSub.activate(false)
+    const onInp = (c) => {
+      
+      console.log("c", c, !isNaN(c as number))
+      if (!isNaN(c as number)) {
+        countSub.deactivate()
+        count.set(c as number)
+        countSub.activate(false)
+      }
+      
     }
-    inp.onInput(onInput)
-    
-    let inputCountSub = new Data().get((e) => {
-      inp.offInput(onInput)
-      inp.value(e as number)
-      inp.onInput(onInput)
-    }, false)
+
+    inp.onInput(onInp)
+
+    const countSub = count.get((count) => {
+      inp.offInput(onInp)
+      inp.value(count)
+      inp.onInput(onInp)
+    })
+
+
 
     
 
