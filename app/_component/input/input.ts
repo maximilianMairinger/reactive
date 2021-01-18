@@ -131,6 +131,11 @@ export default class Input extends Component {
     });
 
 
+    this.input.on("input", (e) => {
+      this.call()
+    })
+
+
     this.apd(this.placeholderElem, this.input as any as HTMLElement);
     this.allElems = new ElementList(this.placeholderElem, this.input as any as HTMLElement);
 
@@ -163,18 +168,15 @@ export default class Input extends Component {
     if (this.isFocused) this.input.focus()
   }
 
-  private inputlisteners: Map<(value: Value, e?: InputEvent) => void, (e: InputEvent) => void> = new Map()
-  public onInput(f: (value: Value, e?: InputEvent) => void) {
-    let inner = (e: InputEvent) => {
-      if (!this.currentlyInvalid) f(this.value(), e)
-      else f("", e)
-    }
-    this.inputlisteners.set(f, inner)
-    this.input.on("input", inner as any)
+  private inputListeners = []
+  private validInputListeners = []
+  public onInput(f: (value: Value, rawValue: string, e?: InputEvent) => void, onlyValid = false) {
+    if (onlyValid) this.validInputListeners.add(f)
+    else this.inputListeners.add(f)
   }
-  public offInput(f: (value: Value, e?: InputEvent) => void) {
-    this.input.off("input", this.inputlisteners.get(f) as any)
-    this.inputlisteners.delete(f)
+  public offInput(f: (value: Value, rawValue: string, e?: InputEvent) => void, onlyValid = false) {
+    if (onlyValid) this.validInputListeners.rmV(f)
+    else this.inputListeners.rmV(f)
   }
 
 
@@ -247,13 +249,7 @@ export default class Input extends Component {
         this.showInvalidation(invalid)
       })()
   
-      if (silent) {
-        // onInput
-        this.inputlisteners.forEach((inner, f) => {
-          if (!this.currentlyInvalid) f(this.value())
-          else f("")
-        })
-      }
+      if (!silent) this.call()
     }
     else {
       let v = this.input.value;
@@ -264,10 +260,17 @@ export default class Input extends Component {
     }
   }
 
+  private call() {
+    const args = [this.value(), this.input.value]
+    this.inputListeners.Call(...args)
+    if (!this.currentlyInvalid) this.validInputListeners.Call(...args)
+  }
+
   private validate(val: any = this.value()): string | boolean | void {
     let invalid: string | boolean | void = false
-    if (this.type() === "number") invalid = isNaN(val) ? "Expected a number" : false;
-    else if (this.type() === "email") invalid = emailValidationRegex.test((val as string).toLowerCase()) ? "This is not a valid email address" : false;
+    const type = this.type()
+    if (type === "number") invalid = isNaN(val) ? "Expected a number" : false;
+    else if (type === "email") invalid = emailValidationRegex.test((val as string).toLowerCase()) ? "This is not a valid email address" : false;
     if (this.customVerification !== undefined) {
       let returnInvalid = this.customVerification(val)
       if (typeof returnInvalid === "boolean") {
