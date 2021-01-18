@@ -8,6 +8,8 @@ const db = new DataBase({})
 const ws = new WebSocket((document.location.protocol === "https:" ? "wss://" : "ws://") + document.location.host + "/admin")
 
 console.log((document.location.protocol === "https:" ? "wss://" : "ws://") + document.location.host + "/admin")
+
+let fatalError = false
 ws.addEventListener("open", () => {
   
   const onMsg = ({ data: strData }) => {
@@ -16,9 +18,18 @@ ws.addEventListener("open", () => {
       data = JSON.parse(strData, (k, v) => v === null ? undefined : v)
     }
     catch(e) {
+      if (!fatalError) {
+        Notifier.error("Internal Server Error", {duration: Infinity})
+        fatalError = true
+      }
+      
       return
     }
+
     
+
+
+
 
 
     serverSub.deactivate()
@@ -28,10 +39,12 @@ ws.addEventListener("open", () => {
   ws.addEventListener("message", onMsg)
 
   ws.addEventListener("close", () => {
-    console.log("Ws connection closed, now offline")
+    Notifier.error("Lost connection to server", "Please reload this page to retry.", {duration: Infinity})
+    
     ws.removeEventListener("message", onMsg)
     serverSub.deactivate()
   })
+
 
   let serverSub = db((data, diff) => {
     console.log("send diff", diff)
@@ -70,14 +83,6 @@ export default class Site extends Component {
 
 
     this.apd(Notifier.queue)
-
-    setTimeout(() => {
-      Notifier.log("Hello")
-      setTimeout(() => {
-        Notifier.log("Hello", "And some more text")
-      }, 1000)
-    }, 1000)
-    
   }
 
   stl() {
