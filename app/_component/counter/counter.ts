@@ -9,9 +9,7 @@ import Input from "./../input/input"
 export default class Counter extends Component {
 
   constructor(count: Data<number>) {
-    super()
-
-    
+    super(false)
 
     const counter = ce("counter-wrapper")
 
@@ -40,7 +38,7 @@ export default class Counter extends Component {
 
 
     const onInp = (c) => {
-      
+      debugger
       console.log("c", c, !isNaN(c as number))
       if (!isNaN(c as number)) {
         countSub.deactivate()
@@ -53,6 +51,7 @@ export default class Counter extends Component {
     inp.onInput(onInp)
 
     const countSub = count.get((count) => {
+      debugger
       inp.offInput(onInp)
       inp.value(count)
       inp.onInput(onInp)
