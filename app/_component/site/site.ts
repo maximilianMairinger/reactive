@@ -2,13 +2,15 @@ import Component from "../component"
 import declareComponent from "../../lib/declareComponent"
 import { DataBase } from "josm"
 import Client from "./../client/client"
+import Notifier from "../../lib/notifier"
 
 const db = new DataBase({})
 const ws = new WebSocket((document.location.protocol === "https:" ? "wss://" : "ws://") + document.location.host + "/admin")
 
 console.log((document.location.protocol === "https:" ? "wss://" : "ws://") + document.location.host + "/admin")
 ws.addEventListener("open", () => {
-  ws.addEventListener("message", ({ data: strData }) => {
+  
+  const onMsg = ({ data: strData }) => {
     let data: any
     try {
       data = JSON.parse(strData, (k, v) => v === null ? undefined : v)
@@ -22,6 +24,13 @@ ws.addEventListener("open", () => {
     serverSub.deactivate()
     db(data)
     serverSub.activate(false)
+  }
+  ws.addEventListener("message", onMsg)
+
+  ws.addEventListener("close", () => {
+    console.log("Ws connection closed, now offline")
+    ws.removeEventListener("message", onMsg)
+    serverSub.deactivate()
   })
 
   let serverSub = db((data, diff) => {
@@ -39,6 +48,7 @@ ws.addEventListener("open", () => {
 
 export default class Site extends Component {
 
+  private clientsBody = this.q("clients-body")
   private elementMap: {[key in string]: Element} = {}
   constructor() {
     super()
@@ -51,12 +61,23 @@ export default class Site extends Component {
           setTimeout(() => {
             const elem = new Client(db[hash])
             this.elementMap[hash] = elem
-            this.componentBody.apd(elem)
+            this.clientsBody.apd(elem)
           })
         }
       }
     }, false)
 
+
+
+    this.apd(Notifier.queue)
+
+    setTimeout(() => {
+      Notifier.log("Hello")
+      setTimeout(() => {
+        Notifier.log("Hello", "And some more text")
+      }, 1000)
+    }, 1000)
+    
   }
 
   stl() {
