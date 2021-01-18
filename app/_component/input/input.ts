@@ -1,5 +1,5 @@
 import Component from "../component";
-import { ElementList, Tel } from "extended-dom"
+import { ElementList } from "extended-dom"
 
 
 var emailValidationRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -54,7 +54,7 @@ export default class Input extends Component {
     if (formHolder) {
       this.onInput((e) => {
         let q = formHolder(e)
-        if (q !== undefined) this.value(q as any )
+        if (q !== undefined) this.value(q as any, true)
       })
     }
 
@@ -181,7 +181,7 @@ export default class Input extends Component {
   public placeholder(to?: string): any {
     return this.placeholderElem.text(to)
   }
-  private upperCaseParseListener = this.input.ls("input", () => {
+  private upperCaseParseListener = this.input.on("input", () => {
     this.input.value = this.input.value.toUpperCase()
   })
 
@@ -192,15 +192,15 @@ export default class Input extends Component {
       this.intrusiveValidation = to === "password" || to === "number"
       if (to === "password") {
         this.input.type = to;
-        this.upperCaseParseListener.disable()
+        this.upperCaseParseListener.deactivate()
       }
       else if (to === "uppercase") {
-        this.upperCaseParseListener.enable()
+        this.upperCaseParseListener.activate()
         this.input.type = "text";
       }
       else {
         this.input.type = "text";
-        this.upperCaseParseListener.disable()
+        this.upperCaseParseListener.deactivate()
       }
       this._type = to;
       return this
@@ -214,8 +214,9 @@ export default class Input extends Component {
   }
   public value(): Value
   public value(to: Value): this
-  public value(to?: Value): any {
+  public value(to?: Value, silent = false): any {
     if (to !== undefined) {
+      if (this.validate(to)) return
       this.input.value = to.toString();
       this.alignPlaceHolder();
   
@@ -244,12 +245,13 @@ export default class Input extends Component {
         this.showInvalidation(invalid)
       })()
   
-  
-      // onInput
-      this.inputlisteners.forEach((inner, f) => {
-        if (!this.currentlyInvalid) f(this.value())
-        else f("")
-      })
+      if (silent) {
+        // onInput
+        this.inputlisteners.forEach((inner, f) => {
+          if (!this.currentlyInvalid) f(this.value())
+          else f("")
+        })
+      }
     }
     else {
       let v = this.input.value;
@@ -260,12 +262,12 @@ export default class Input extends Component {
     }
   }
 
-  private validate(): string | boolean | void {
+  private validate(val: any = this.value()): string | boolean | void {
     let invalid: string | boolean | void = false
-    if (this.type() === "number") invalid = isNaN(this.value() as number) ? "Expected a number" : false;
-    else if (this.type() === "email") invalid = emailValidationRegex.test((this.value() as string).toLowerCase()) ? "This is not a valid email address" : false;
+    if (this.type() === "number") invalid = isNaN(val) ? "Expected a number" : false;
+    else if (this.type() === "email") invalid = emailValidationRegex.test((val as string).toLowerCase()) ? "This is not a valid email address" : false;
     if (this.customVerification !== undefined) {
-      let returnInvalid = this.customVerification(this.value())
+      let returnInvalid = this.customVerification(val)
       if (typeof returnInvalid === "boolean") {
         if (!returnInvalid) invalid = false
       }
