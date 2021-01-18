@@ -54,7 +54,9 @@ export default class Input extends Component {
     if (formHolder) {
       this.onInput((e) => {
         let q = formHolder(e)
-        if (q !== undefined) this.value(q as any, true)
+        if (q !== undefined) 
+          //@ts-ignore
+          this.value(q as any, true)
       })
     }
 
