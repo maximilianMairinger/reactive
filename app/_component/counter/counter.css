@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 counter-wrapper {
   display: flex;
   align-items: center;
