@@ -50,25 +50,23 @@ export default function init(indexUrl: string = "*", wsUrl: string = "/") {
   })
 
 
-  
-  app.port.then((port) => {
-  // inject
-  const swInjUrl = `
-<!-- Code Injected by the live server -->
-<script>
-(() => {
-let wsUrl = "${wsUrl}";
-${swInjection}
-})()
-</script>`
-
+    // inject
+    const swInjUrl = `
+    <!-- Code Injected by the live server -->
+    <script>
+    (() => {
+    let wsUrl = "${wsUrl}";
+    ${swInjection}
+    })()
+    </script>`
+    
     activateSetFileProxy((file, ext) => {
       if (ext === ".html" || ext === ".htm") {
         let injectAt = file.lastIndexOf("</body>")
-        return file.splice(injectAt, 0, swInjUrl)
+        return file.splice(injectAt + "</body>".length, 0, swInjUrl)
       }
     })
-  })
+
 
   
   return app

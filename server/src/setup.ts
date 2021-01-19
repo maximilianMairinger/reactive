@@ -66,7 +66,7 @@ export function configureExpressApp(indexUrl: string, publicPath: string, sendFi
   app.port = port
 
   
-  app.use(express.static(pth.join(pth.resolve(""), publicPath)))
+  app.use(express.static(pth.join(pth.resolve(""), publicPath), {index: false}))
   
   app.get(indexUrl, (req, res) => {
     res.sendFile("public/index.html")
