@@ -1,5 +1,6 @@
 import lang from "./../lib/lang"
 import { DataBase, Data } from "josm";
+import "../global"
 
 type PrimElem = string | number | boolean | Element
 type Token = string | string[]
