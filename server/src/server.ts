@@ -44,7 +44,7 @@ app.ws("/client", (ws) => {
   
   
   ws.on("message", (e) => {
-    const msg = JSON.parse(e.data)
+    const msg = JSON.parse(e as any)
     for (let k in msg) {
       if (me[k]) me[k].set(msg[k])
     }
