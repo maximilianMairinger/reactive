@@ -18,8 +18,15 @@ app.ws("/admin", (ws) => {
     ws.send(JSON.stringify(diff, (k, v) => v === undefined ? null : v))
   }, true, true)
 
-  ws.on("message", ({ data: diff}) => {
-    clients(JSON.parse(diff, (k, v) => v === null ? undefined : v))
+  ws.on("message", (diff) => {
+    console.log("msgAdmin", diff)
+    try {
+      clients(JSON.parse(diff as any, (k, v) => v === null ? undefined : v))
+    }
+    catch(e) {
+      clients(JSON.parse(diff.data as any, (k, v) => v === null ? undefined : v))
+    }
+    
   })
 })
 
@@ -44,7 +51,15 @@ app.ws("/client", (ws) => {
   
   
   ws.on("message", (e) => {
-    const msg = JSON.parse(e as any)
+    console.log("msg client", e)
+    let msg;
+    try {
+      msg = JSON.parse(e as any)
+    }
+    catch(e) {
+      msg = JSON.parse(e.data as any)
+    }
+    
     for (let k in msg) {
       if (me[k]) me[k].set(msg[k])
     }
@@ -52,6 +67,7 @@ app.ws("/client", (ws) => {
 
 
   const close = () => {
+    console.log("bye", h)
     sub1.deactivate()
     sub2.deactivate()
     const o = {}
