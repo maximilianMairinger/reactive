@@ -43,10 +43,12 @@ jobs:
   dependencies: 
     runs-on: ubuntu-latest
 
-    - name: "checkout"
-      uses: actions/checkout@master
+    
     
     steps: 
+    - name: "checkout"
+      uses: actions/checkout@master
+      
     - name: Copy dependency files
       uses: appleboy/scp-action@v0.1.1
       with:
