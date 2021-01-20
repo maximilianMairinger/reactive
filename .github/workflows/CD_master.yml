@@ -34,7 +34,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        source: "public,server/dist,server/res,replServer/dist,replServer/res"
+        source: "public,server/dist,server/res,replServer/dist,replServer/res,.deploy"
         target: /var/www/html/reactive/master
         tar_tmp_path: true
 
@@ -43,16 +43,18 @@ jobs:
   dependencies: 
     runs-on: ubuntu-latest
 
+    - name: "checkout"
+      uses: actions/checkout@master
     
     steps: 
-    - name: 
+    - name: Copy dependency files
       uses: appleboy/scp-action@v0.1.1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        source: "package.json,./.deploy"
+        source: "package.json"
         target: /var/www/html/reactive/master
         tar_tmp_path: true
 
