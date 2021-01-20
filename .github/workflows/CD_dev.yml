@@ -23,13 +23,13 @@ jobs:
       uses: actions/setup-node@master
       with:
         node-version: '14.x'
-    - run: npm run build --if-present
+      run: npm run build --if-present
 
     - name: "Running tests"
       uses: actions/setup-node@master
       with:
         node-version: '14.x'
-    - run: npm test --if-present
+      run: npm test --if-present
 
     - name: "Copy files to remote"
       uses: garygrossgarten/github-action-scp@v0.7.1
