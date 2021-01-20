@@ -16,7 +16,7 @@ app.ws("/admin", (ws) => {
   console.log("admin connect")
   clients((clients: any, diff: any) => {
     ws.send(JSON.stringify(diff, (k, v) => v === undefined ? null : v))
-  }, true)
+  }, true, true)
 
   ws.on("message", ({ data: diff}) => {
     clients(JSON.parse(diff, (k, v) => v === null ? undefined : v))
