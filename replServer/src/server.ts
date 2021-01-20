@@ -16,13 +16,20 @@ app.ws("/admin", (ws) => {
     ws.send(JSON.stringify(diff))
   }, true, true)
 
-
   ws.on("message", (e) => {
     sub.deactivate()
     db(JSON.parse(e as any))
     sub.activate(false)
   })
   
+
+
+  const end = () => {
+    console.log("closing client " + clientNum)
+    sub.deactivate()
+  }
+  ws.on("close", end)
+  ws.on("error", end)
 })
 
 
