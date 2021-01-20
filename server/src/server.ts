@@ -39,8 +39,8 @@ app.ws("/client", (ws) => {
 
   const me = clients(c)[h]
 
-  me.val.get((val) => {ws.send(JSON.stringify({val}))})
-  me.name.get((name) => {ws.send(JSON.stringify({name}))})
+  const sub1 = me.val.get((val) => {ws.send(JSON.stringify({val}))})
+  const sub2 = me.name.get((name) => {ws.send(JSON.stringify({name}))})
   
   
   ws.on("message", (e) => {
@@ -49,6 +49,18 @@ app.ws("/client", (ws) => {
       if (me[k]) me[k].set(msg[k])
     }
   })
+
+
+  const close = () => {
+    sub1.deactivate()
+    sub2.deactivate()
+    const o = {}
+    o[h] = undefined
+    clients(o)
+  }
+
+  ws.on("error", close)
+  ws.on("close", close)
 })
 
 
