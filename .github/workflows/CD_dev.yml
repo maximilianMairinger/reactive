@@ -17,7 +17,7 @@ jobs:
       uses: actions/setup-node@master
       with:
         node-version: '14.x'
-    - run: npm i
+      run: npm i
     
     - name: "Running build"
       uses: actions/setup-node@master
@@ -36,7 +36,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
+        privateKey: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         local: ./public
         remote: /var/www/html/reactive/dev/test123
@@ -55,7 +55,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
+        privateKey: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         local: ./package.json
         remote: ./package.json
