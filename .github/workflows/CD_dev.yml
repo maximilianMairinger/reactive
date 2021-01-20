@@ -11,28 +11,28 @@ jobs:
     
     steps: 
     - name: "checkout"
-    - uses: actions/checkout@master
+      uses: actions/checkout@master
 
     - name: Install dependencies for runner
-    - uses: actions/setup-node@master
+      uses: actions/setup-node@master
       with:
         node-version: '14.x'
     - run: npm i
     
     - name: "Running build"
-    - uses: actions/setup-node@master
+      uses: actions/setup-node@master
       with:
         node-version: '14.x'
     - run: npm run build --if-present
 
     - name: "Running tests"
-    - uses: actions/setup-node@master
+      uses: actions/setup-node@master
       with:
         node-version: '14.x'
     - run: npm test --if-present
 
     - name: "Copy files to remote"
-    - uses: garygrossgarten/github-action-scp@v0.7.1
+      uses: garygrossgarten/github-action-scp@v0.7.1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
@@ -51,7 +51,7 @@ jobs:
     
     steps: 
     - name: 
-    - uses: garygrossgarten/github-action-scp@v0.7.1
+      uses: garygrossgarten/github-action-scp@v0.7.1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
@@ -61,7 +61,7 @@ jobs:
         remote: ./package.json
 
     - name: "Installing dependencies on remote"
-    - uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@master
       with: 
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
@@ -76,7 +76,7 @@ jobs:
 
     steps:
     - name: "Installing dependencies on remote"
-    - uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@master
       with: 
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
