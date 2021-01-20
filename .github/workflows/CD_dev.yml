@@ -34,8 +34,8 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        source: "public,server/dist"
-        target: /var/www/html/reactive/dev/test3
+        source: "public,server/dist,replServer/dist"
+        target: /var/www/html/reactive/dev
         tar_tmp_path: true
 
     
@@ -46,14 +46,15 @@ jobs:
     
     steps: 
     - name: 
-      uses: garygrossgarten/github-action-scp@v0.7.1
+      uses: appleboy/scp-action@v0.1.1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        privateKey: ${{ secrets.KEY }}
+        key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        local: ./package.json
-        remote: ./package.json
+        source: "package.json,.deploy"
+        target: /var/www/html/reactive/dev
+        tar_tmp_path: true
 
     - name: "Installing dependencies on remote"
       uses: appleboy/ssh-action@master
