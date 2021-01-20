@@ -65,6 +65,9 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           cd /var/www/html/reactive/dev
+          source ~/.nvm/nvm.sh
+          nvm use 14.0.0
+          npm i
 
   deploy: 
     runs-on: ubuntu-latest
