@@ -28,16 +28,14 @@ jobs:
       run: npm test --if-present
 
     - name: "Copying files to remote"
-      uses: garygrossgarten/github-action-scp@v0.7.1
+      uses: appleboy/scp-action@v0.1.1
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        privateKey: ${{ secrets.KEY }}
+        key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        local: |
-          ./public
-          ./server/dist
-        remote: /var/www/html/reactive/dev/test2
+        source: "public,server/dist"
+        remote: /var/www/html/reactive/dev/test3
         atomicPut: true
         concurrency: 1
 
