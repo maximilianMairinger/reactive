@@ -22,7 +22,7 @@ app.ws("/admin", (ws) => {
   
   ws.on("message", (diff) => {
     console.log("msgAdmin", diff)
-    clients(JSON.parse(diff.data as any))
+    clients(JSON.parse(diff as any))
   })
 
 
@@ -58,12 +58,10 @@ app.ws("/client", (ws) => {
   ws.on("message", (e) => {
     console.log("msg client", e)
     let msg;
-    try {
-      msg = JSON.parse(e as any)
-    }
-    catch(e) {
-      msg = JSON.parse(e.data as any)
-    }
+    
+    msg = JSON.parse(e as any)
+    
+    
     
     for (let k in msg) {
       if (me[k]) me[k].set(msg[k])
