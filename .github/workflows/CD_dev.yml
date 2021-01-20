@@ -35,7 +35,7 @@ jobs:
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         source: "public,server/dist"
-        remote: /var/www/html/reactive/dev/test3
+        target: /var/www/html/reactive/dev/test3
         tar_tmp_path: true
 
     
