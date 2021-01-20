@@ -1,7 +1,7 @@
 import { configureExpressApp } from "./../../server/src/setup"
 import expressWs from "express-ws"
 import LinkedList from "fast-linked-list"
-import { Data, DataBase } from "josm"
+import { Data, DataBase, DataBaseSubscription } from "josm"
 import hash from "./hash"
 
 
@@ -14,10 +14,15 @@ const clients: DataBase<{[identifier: string]: {val: Data<number>, name: Data<st
 
 app.ws("/admin", (ws) => {
   console.log("admin connect")
-  clients((clients: any, diff: any) => {
-    ws.send(JSON.stringify(diff, (k, v) => v === undefined ? null : v))
+  let sub: DataBaseSubscription<any> = clients((clients: any, diff: any) => {
+    try {
+      ws.send(JSON.stringify(diff, (k, v) => v === undefined ? null : v))
+    }
+    catch(e) {}
+    
   }, true, true)
 
+  
   ws.on("message", (diff) => {
     console.log("msgAdmin", diff)
     try {
@@ -28,6 +33,15 @@ app.ws("/admin", (ws) => {
     }
     
   })
+
+
+  const close = () => {
+    console.log("bye", "admin")
+    sub.deactivate()
+  }
+
+  ws.on("error", close)
+  ws.on("close", close)
 })
 
 
@@ -46,8 +60,22 @@ app.ws("/client", (ws) => {
 
   const me = clients(c)[h]
 
-  const sub1 = me.val.get((val) => {ws.send(JSON.stringify({val}))})
-  const sub2 = me.name.get((name) => {ws.send(JSON.stringify({name}))})
+  const sub1 = me.val.get((val) => {
+    try {
+      ws.send(JSON.stringify({val}))
+    }
+    catch(e) {
+
+    }
+  })
+  const sub2 = me.name.get((name) => {
+    try {
+      ws.send(JSON.stringify({name})) 
+    }
+    catch(e) {
+      
+    }
+  })
   
   
   ws.on("message", (e) => {
