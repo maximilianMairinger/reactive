@@ -36,8 +36,7 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         source: "public,server/dist"
         remote: /var/www/html/reactive/dev/test3
-        atomicPut: true
-        concurrency: 1
+        tar_tmp_path: true
 
     
 
