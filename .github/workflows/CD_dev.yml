@@ -6,28 +6,55 @@ on:
     - dev
 
 jobs:
-
-  CI: 
-    name: CI
+  build: 
     runs-on: ubuntu-latest
     
     steps: 
+    - name: "checkout"
     - uses: actions/checkout@master
+
+    - name: Install dependencies for runner
     - uses: actions/setup-node@master
       with:
         node-version: '14.x'
-    - run: |
-        npm i
-        npm run build --if-present
-        npm test --if-present
-      env:
-        CI: true
-  CD:
-    name: CD
-    runs-on: ubuntu-latest
-    needs: CI
+    - run: npm i
+    
+    - name: "Running build"
+    - run: npm run build --if-present
 
+    - name: "Running tests"
+    - run: npm test --if-present
+
+    - name: "Copy files to remote"
+    - uses: garygrossgarten/github-action-scp@v0.7.1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        local: ./public
+        remote: /var/www/html/reactive/dev/test123
+        atomicPut: true
+        concurrency: 1
+
+    
+
+  dependencies: 
+    runs-on: ubuntu-latest
+
+    
     steps: 
+    - name: 
+    - uses: garygrossgarten/github-action-scp@v0.7.1
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        local: ./package.json
+        remote: ./package.json
+
+    - name: "Installing dependencies on remote"
     - uses: appleboy/ssh-action@master
       with: 
         host: ${{ secrets.HOST }}
@@ -36,12 +63,51 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           cd /var/www/html/reactive/dev
-          git pull
+
+  deploy: 
+    runs-on: ubuntu-latest
+    needs: [build, dependencies]
+
+    - name: "Installing dependencies on remote"
+    - uses: appleboy/ssh-action@master
+      with: 
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        script: |
+          cd /var/www/html/reactive/dev
           source ~/.nvm/nvm.sh
           nvm use 14.0.0
           wait-on ecosystem.config.js
-          rm -r node_modules
-          rm package-lock.json
-          npm i
-          npm run build --if-present
           node pm2Reload.js
+
+  
+
+
+        
+  
+
+  # CD:
+  #   name: CD
+  #   runs-on: ubuntu-latest
+  #   needs: CI
+
+  #   steps: 
+  #   - uses: appleboy/ssh-action@master
+  #     with: 
+  #       host: ${{ secrets.HOST }}
+  #       username: ${{ secrets.USERNAME }}
+  #       key: ${{ secrets.KEY }}
+  #       passphrase: ${{ secrets.PASSPHRASE }}
+  #       script: |
+  #         cd /var/www/html/reactive/dev
+  #         git pull
+  #         source ~/.nvm/nvm.sh
+  #         nvm use 14.0.0
+  #         wait-on ecosystem.config.js
+  #         rm -r node_modules
+  #         rm package-lock.json
+  #         npm i
+  #         npm run build --if-present
+  #         node pm2Reload.js
