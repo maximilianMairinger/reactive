@@ -34,8 +34,10 @@ jobs:
         username: ${{ secrets.USERNAME }}
         privateKey: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        local: ./public
-        remote: /var/www/html/reactive/dev/test123
+        local: |
+          ./public
+          ./server/dist
+        remote: /var/www/html/reactive/dev/test2
         atomicPut: true
         concurrency: 1
 
