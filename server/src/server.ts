@@ -3,6 +3,7 @@ import expressWs from "express-ws"
 import LinkedList from "fast-linked-list"
 import { Data, DataBase, DataBaseSubscription } from "josm"
 import hash from "./hash"
+import * as JSON from "telejson"
 
 
 const app = configureExpressApp("/", "public", undefined, (app) => {expressWs(app)}) as ReturnType<typeof configureExpressApp> & { ws: (route: string, fn: (ws: WebSocket & {on: WebSocket["addEventListener"], off: WebSocket["removeEventListener"]}, req: any) => void) => void }
@@ -14,24 +15,14 @@ const clients: DataBase<{[identifier: string]: {val: Data<number>, name: Data<st
 
 app.ws("/admin", (ws) => {
   console.log("admin connect")
-  let sub: DataBaseSubscription<any> = clients((clients: any, diff: any) => {
-    try {
-      ws.send(JSON.stringify(diff, (k, v) => v === undefined ? null : v))
-    }
-    catch(e) {}
-    
+  const sub = clients((clients: any, diff: any) => {
+    ws.send(JSON.stringify(diff))
   }, true, true)
 
   
   ws.on("message", (diff) => {
     console.log("msgAdmin", diff)
-    try {
-      clients(JSON.parse(diff as any, (k, v) => v === null ? undefined : v))
-    }
-    catch(e) {
-      clients(JSON.parse(diff.data as any, (k, v) => v === null ? undefined : v))
-    }
-    
+    clients(JSON.parse(diff.data as any))
   })
 
 
@@ -60,22 +51,8 @@ app.ws("/client", (ws) => {
 
   const me = clients(c)[h]
 
-  const sub1 = me.val.get((val) => {
-    try {
-      ws.send(JSON.stringify({val}))
-    }
-    catch(e) {
-
-    }
-  })
-  const sub2 = me.name.get((name) => {
-    try {
-      ws.send(JSON.stringify({name})) 
-    }
-    catch(e) {
-      
-    }
-  })
+  const sub1 = me.val.get((val) => {ws.send(JSON.stringify({val}))})
+  const sub2 = me.name.get((name) => {ws.send(JSON.stringify({name})) })
   
   
   ws.on("message", (e) => {
@@ -95,7 +72,7 @@ app.ws("/client", (ws) => {
 
 
   const close = () => {
-    console.log("bye", h)
+    console.log("bye client", h)
     sub1.deactivate()
     sub2.deactivate()
     const o = {}

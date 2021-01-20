@@ -3,6 +3,7 @@ import declareComponent from "../../lib/declareComponent"
 import { DataBase } from "josm"
 import Client from "./../client/client"
 import Notifier from "../../lib/notifier"
+import * as JSON from "telejson"
 
 const db = new DataBase({})
 const ws = new WebSocket((document.location.protocol === "https:" ? "wss://" : "ws://") + document.location.host + "/admin")
@@ -15,7 +16,7 @@ ws.addEventListener("open", () => {
   const onMsg = ({ data: strData }) => {
     let data: any
     try {
-      data = JSON.parse(strData, (k, v) => v === null ? undefined : v)
+      data = JSON.parse(strData)
     }
     catch(e) {
       if (!fatalError) {
